@@ -659,11 +659,7 @@
     function defaultApp() {
       return {
         baseHours: 24,
-        suspects: [
-          createSuspect("甲"),
-          createSuspect("乙"),
-          createSuspect("丙")
-        ]
+        suspects: []
       };
     }
 
@@ -693,6 +689,7 @@
       try {
         const parsed = JSON.parse(raw);
         if (!parsed.suspects || !Array.isArray(parsed.suspects)) return defaultApp();
+        if (isBlankDemo(parsed.suspects)) return defaultApp();
         parsed.baseHours = 24;
         parsed.suspects.forEach(s => {
           if (!s.periods || s.periods.length !== reasons.length) {
@@ -707,6 +704,17 @@
       } catch {
         return defaultApp();
       }
+    }
+
+    function isBlankDemo(suspects) {
+      if (!Array.isArray(suspects) || suspects.length !== 3) return false;
+      const names = suspects.map(s => s.name).join(",");
+      if (names !== "甲,乙,丙") return false;
+      return suspects.every(s =>
+        !s.arrestTime &&
+        Array.isArray(s.periods) &&
+        s.periods.every(p => !p.checked && !p.start && !p.end && !p.desc)
+      );
     }
 
     function saveData() {
