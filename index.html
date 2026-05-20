@@ -559,6 +559,8 @@
           </div>
           <div class="toolbar-right">
             <button class="orange" onclick="printAllPages()">列印全部</button>
+            <button class="green" onclick="exportWordFile()">產生WORD檔</button>
+            <button class="ghost" onclick="exportPdfFile()">產生PDF檔</button>
             <button class="green" onclick="addSuspect()">新增犯嫌</button>
             <button class="red" onclick="clearAllData()">清除全部</button>
           </div>
@@ -648,7 +650,7 @@
       "依第一百條之三第一項規定不得為訊問",
       "因被告或犯罪嫌疑人身體健康突發之事由，事實上不能訊問",
       "被告或犯罪嫌疑人表示已選任辯護人，或強制辯護案件，因等候其辯護人到場致未予訊問者",
-      "依第三十五條第三項通知陪同在場之人到場致未予訊問者",
+      "被告或犯罪嫌疑人須由通譯傳譯，因等候其通譯到場致未予訊問",
       "犯罪嫌疑人經法院提審之期間",
       "依第三十四條第二項辯護人與偵查中受拘提或逮捕之被告或犯罪嫌疑人接見之時間"
     ];
@@ -692,6 +694,11 @@
         if (isBlankDemo(parsed.suspects)) return defaultApp();
         parsed.baseHours = 24;
         parsed.suspects.forEach(s => {
+          if (Array.isArray(s.periods)) {
+            s.periods.forEach((p, index) => {
+              if (reasons[index]) p.reason = reasons[index];
+            });
+          }
           if (!s.periods || s.periods.length !== reasons.length) {
             s.periods = reasons.map((reason, index) => {
               const code = String(index + 1).padStart(2, "0");
@@ -1020,6 +1027,63 @@
       document.getElementById("pageDetail").classList.remove("active");
       document.getElementById("pageList").classList.add("active");
       renderList();
+    }
+
+    function exportWordFile() {
+      saveAndRender();
+      buildPrintAllContainer();
+      const container = document.getElementById("printAllContainer");
+      const fileName = makeExportFileName("法定障礙事由時間控管表", "doc");
+      const html = `
+        <!doctype html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>法定障礙事由時間控管表</title>
+          <style>
+            body { font-family: "Microsoft JhengHei", Arial, sans-serif; font-size: 12pt; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+            th, td { border: 1px solid #000; padding: 6px; vertical-align: top; }
+            th { background: #eee; }
+            .print-page { page-break-after: always; }
+            .print-page:last-child { page-break-after: auto; }
+            .print-section-title { font-size: 18pt; font-weight: bold; margin: 0 0 10px; }
+            .print-subtitle { margin: 0 0 10px; }
+            .print-detail-block { border: 1px solid #000; padding: 8px; margin-bottom: 8px; }
+          </style>
+        </head>
+        <body>${container.innerHTML}</body>
+        </html>
+      `;
+      const blob = new Blob(["﻿", html], { type: "application/msword;charset=utf-8" });
+      downloadBlob(blob, fileName);
+    }
+
+    function exportPdfFile() {
+      saveAndRender();
+      buildPrintAllContainer();
+      document.body.classList.add("print-all");
+      setTimeout(() => {
+        alert("接下來會開啟列印視窗，請在印表機選擇「另存為 PDF」或「Microsoft Print to PDF」。");
+        window.print();
+      }, 100);
+    }
+
+    function makeExportFileName(baseName, ext) {
+      const d = new Date();
+      const roc = d.getFullYear() - 1911;
+      return `${baseName}_${roc}${pad(d.getMonth() + 1)}${pad(d.getDate())}_${pad(d.getHours())}${pad(d.getMinutes())}.${ext}`;
+    }
+
+    function downloadBlob(blob, fileName) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
     }
 
     function printPage() {
