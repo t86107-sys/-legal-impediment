@@ -1,0 +1,1296 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>法定障礙事由時間控管表</title>
+  <style>
+    :root {
+      --bg: #f4f6fb;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --green: #16a34a;
+      --red: #dc2626;
+      --orange: #ea580c;
+      --soft-blue: #eff6ff;
+      --soft-red: #fef2f2;
+      --soft-green: #f0fdf4;
+      --shadow: 0 12px 30px rgba(15, 23, 42, .08);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.65;
+    }
+
+    header {
+      background: linear-gradient(135deg, #172554, #2563eb);
+      color: #fff;
+      padding: 26px 20px;
+    }
+
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    h1, h2, h3 { margin: 0; }
+
+    h1 { font-size: 28px; letter-spacing: .04em; }
+    h2 { font-size: 21px; margin-bottom: 14px; }
+    h3 { font-size: 17px; margin-bottom: 10px; }
+
+    header p {
+      margin: 6px 0 0;
+      opacity: .9;
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 22px auto 50px;
+      padding: 0 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: end;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .toolbar-left, .toolbar-right {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: end;
+    }
+
+    label {
+      display: block;
+      font-weight: 750;
+      margin-bottom: 6px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 11px;
+      padding: 10px 12px;
+      font-size: 15px;
+      color: var(--text);
+      background: #fff;
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .field-small { width: 150px; }
+    .field-medium { width: 230px; }
+
+    button {
+      border: 0;
+      border-radius: 11px;
+      padding: 10px 14px;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    button:hover { background: var(--primary-dark); }
+    button.green { background: var(--green); }
+    button.red { background: var(--red); }
+    button.gray { background: #475569; }
+    button.orange { background: var(--orange); }
+
+    .suspect-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .suspect-cell input {
+      flex: 1;
+    }
+
+    .drag-handle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: #eef2ff;
+      color: #1e40af;
+      font-weight: 900;
+      cursor: grab;
+      user-select: none;
+      flex: 0 0 auto;
+    }
+
+    .drag-handle:active {
+      cursor: grabbing;
+    }
+
+    tr.drag-over td {
+      background: #dbeafe !important;
+      outline: 2px dashed #2563eb;
+      outline-offset: -2px;
+    }
+
+    .write-line {
+      min-height: 30px;
+      border-bottom: 1px solid #94a3b8;
+      color: var(--muted);
+    }
+
+    .print-label {
+      display: none;
+    }
+
+    #printAllContainer {
+      display: none;
+    }
+
+    @media print {
+      @page { size: A4 portrait; margin: 8mm; }
+
+      body {
+        background: #fff;
+        color: #000;
+        font-size: 8.5pt;
+      }
+
+      header {
+        background: #fff;
+        color: #000;
+        padding: 0 0 10px;
+        border-bottom: 2px solid #000;
+        margin-bottom: 12px;
+      }
+
+      header p { display: none; }
+
+      main {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .page:not(.active) { display: none !important; }
+
+      body.print-all .page,
+      body.print-all header p {
+        display: none !important;
+      }
+
+      body.print-all #printAllContainer {
+        display: block !important;
+      }
+
+      .print-page {
+        break-after: page;
+        page-break-after: always;
+      }
+
+      .print-page:last-child {
+        break-after: auto;
+        page-break-after: auto;
+      }
+
+      .print-section-title {
+        font-size: 18pt;
+        font-weight: 900;
+        margin: 0 0 10px;
+      }
+
+      .print-subtitle {
+        font-size: 12pt;
+        margin: 0 0 10px;
+      }
+
+      .print-detail-block {
+        border: 1px solid #000;
+        padding: 8px;
+        margin-bottom: 8px;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      .card {
+        box-shadow: none;
+        border: 0;
+        border-radius: 0;
+        padding: 0;
+        margin-bottom: 14px;
+      }
+
+      .toolbar-right, button, .muted, .warning, .empty {
+        display: none !important;
+      }
+
+      input, select, textarea {
+        border: 0;
+        padding: 0;
+        background: transparent;
+        color: #000;
+        font-size: 12pt;
+      }
+
+      textarea {
+        min-height: auto;
+        overflow: visible;
+      }
+
+      table {
+        border: 1px solid #000;
+        border-radius: 0;
+        min-width: 0 !important;
+        width: 100% !important;
+        table-layout: fixed;
+      }
+
+      th, td {
+        border: 1px solid #000;
+        padding: 3px;
+        vertical-align: top;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+      }
+
+      .arrest-time-cell {
+        min-width: 0;
+        white-space: normal;
+      }
+
+      .arrest-time-cell input,
+      .arrest-time-input {
+        width: 100% !important;
+        min-width: 0;
+        white-space: normal;
+        overflow: visible;
+        font-size: 8pt;
+        line-height: 1.25;
+      }
+
+      th {
+        background: #eee !important;
+        color: #000;
+      }
+
+      .badge {
+        background: transparent !important;
+        color: #000 !important;
+        border: 0;
+        padding: 0;
+      }
+
+      .detail-header, .grid-3, .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .summary-box {
+        border: 1px solid #000;
+        background: #fff;
+      }
+
+      .summary-box .value {
+        color: #000;
+        font-size: 10pt;
+      }
+
+      .reason-card {
+        border: 1px solid #000;
+        border-radius: 0;
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
+      .reason-card:not(.active) {
+        display: none;
+      }
+
+      th.action-col .screen-label {
+        display: none;
+      }
+
+      th.action-col::after {
+        content: "抵達時間";
+      }
+
+      td.action-col button {
+        display: none !important;
+      }
+
+      td.action-col::after {
+        content: "　　　　　　　　　";
+        display: block;
+        min-height: 26px;
+        border-bottom: 1px solid #000;
+      }
+
+      .drag-handle {
+        display: none !important;
+      }
+
+      .suspect-cell {
+        display: block;
+      }
+
+      .reason-body {
+        display: block !important;
+      }
+
+      .duration-line {
+        background: transparent;
+        color: #000;
+        padding: 0;
+      }
+    }
+
+    .ghost {
+      color: var(--primary);
+      background: #dbeafe;
+    }
+    .ghost:hover { background: #bfdbfe; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 14px;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--border);
+      padding: 12px;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #334155;
+      font-size: 14px;
+      letter-spacing: .03em;
+    }
+
+    tr:hover td { background: #fafcff; }
+
+    .right { text-align: right; }
+    .center { text-align: center; }
+    .muted { color: var(--muted); font-size: 14px; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+      background: var(--soft-blue);
+      color: #1e40af;
+    }
+
+    .badge.red { background: var(--soft-red); color: #991b1b; }
+    .badge.green { background: var(--soft-green); color: #166534; }
+    .badge.gray { background: #f1f5f9; color: #475569; }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .detail-header {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .summary-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 14px;
+    }
+
+    .summary-box .value {
+      font-size: 22px;
+      color: var(--primary);
+      font-weight: 900;
+      margin-top: 3px;
+    }
+
+    .reason-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .reason-card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: #fff;
+      padding: 15px;
+    }
+
+    .reason-card.active {
+      border-color: #93c5fd;
+      background: #f8fbff;
+    }
+
+    .reason-title {
+      display: flex;
+      gap: 10px;
+      align-items: start;
+      cursor: pointer;
+      font-weight: 850;
+    }
+
+    .reason-title input {
+      width: auto;
+      margin-top: 6px;
+    }
+
+    .reason-body {
+      display: none;
+      border-top: 1px dashed #cbd5e1;
+      margin-top: 12px;
+      padding-top: 12px;
+    }
+
+    .reason-card.active .reason-body { display: block; }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .duration-line {
+      margin-top: 10px;
+      padding: 9px 11px;
+      background: var(--soft-blue);
+      color: #1e40af;
+      border-radius: 11px;
+      font-weight: 850;
+    }
+
+    .warning {
+      padding: 12px 14px;
+      border-radius: 13px;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      color: #9a3412;
+      margin-top: 12px;
+      display: none;
+    }
+
+    .warning.show { display: block; }
+
+    .report-box {
+      min-height: 220px;
+      font-family: "Microsoft JhengHei", system-ui, sans-serif;
+    }
+
+    .empty {
+      padding: 22px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed #cbd5e1;
+      border-radius: 14px;
+      background: #f8fafc;
+    }
+
+    @media (max-width: 980px) {
+      .detail-header, .grid-3, .grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .table-scroll {
+        overflow-x: auto;
+      }
+      table { min-width: 1180px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>法定障礙事由時間控管表</h1>
+      <p>摘要：多名犯嫌總覽；明細：每名犯嫌各自計算法定障礙時間。資料僅暫存在本機瀏覽器。</p>
+    </div>
+  </header>
+
+  <main>
+    <section id="pageList" class="page active">
+      <div class="card">
+        <div class="toolbar">
+          <div>
+            <h2>摘要｜犯嫌總覽</h2>
+            <div class="muted">呈現各犯嫌之拘捕時間、司法警察歷經法定障礙時間及24小時屆滿時間。</div>
+          </div>
+          <div class="toolbar-right">
+            <button class="orange" onclick="printAllPages()">列印全部</button>
+            <button class="green" onclick="addSuspect()">新增犯嫌</button>
+            <button class="red" onclick="clearAllData()">清除全部</button>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 14%;">犯嫌</th>
+                <th style="width: 19%;">拘捕時間</th>
+                <th style="width: 17%;">司法警察歷經法定障礙時間</th>
+                <th style="width: 15%;">司法警察距16小時屆滿剩餘時間</th>
+                <th style="width: 20%;">24小時屆滿時間</th>
+                <th class="center action-col" style="width: 10%;"><span class="screen-label">操作</span></th>
+              </tr>
+            </thead>
+            <tbody id="suspectTableBody"></tbody>
+          </table>
+        </div>
+
+        <div id="emptyList" class="empty" style="display:none;">尚未建立犯嫌資料，請按「新增犯嫌」。</div>
+
+        <p class="muted">24小時屆滿時間計算方式：拘捕時間＋24小時＋已合併之法定障礙時間。</p>
+      </div>
+    </section>
+
+    <section id="pageDetail" class="page">
+      <div class="card">
+        <div class="toolbar">
+          <div>
+            <h2 id="detailTitle">明細｜法定障礙時間細節</h2>
+            <div class="muted">每一名犯嫌為一頁，勾選事由後輸入起迄時間，系統自動計算並合併重疊區間。</div>
+          </div>
+          <div class="toolbar-right">
+            <button class="ghost" onclick="printPage()">列印本頁</button>
+            <button class="gray" onclick="goList()">返回總覽</button>
+          </div>
+        </div>
+
+        <div class="detail-header">
+          <div>
+            <label for="detailName">犯嫌</label>
+            <input id="detailName" placeholder="例如：甲" oninput="updateCurrentSuspectField('name', this.value)" />
+          </div>
+          <div>
+            <label for="detailArrestTime">拘捕時間</label>
+            <input id="detailArrestTime" type="text" placeholder="例如：11505191400" onchange="updateCurrentSuspectField('arrestTime', this.value)" />
+          </div>
+          <div class="summary-box">
+            <div class="muted">司法警察歷經法定障礙時間</div>
+            <div id="detailObstacleTotal" class="value">0 小時 0 分</div>
+          </div>
+          <div class="summary-box">
+            <div class="muted">24小時屆滿時間</div>
+            <div id="detailRemainTime" class="value">未設定</div>
+          </div>
+        </div>
+
+        <div id="detailWarning" class="warning"></div>
+      </div>
+
+      <div class="card">
+        <h2>法定障礙事由明細</h2>
+        <div id="reasonList" class="reason-list"></div>
+      </div>
+
+      <div class="card">
+        <h2>輸出文字</h2>
+        <textarea id="report" class="report-box" readonly placeholder="按下「產生文字」後，這裡會出現可複製文字。"></textarea>
+        <div class="toolbar-left" style="margin-top:12px;">
+          <button onclick="generateReport()">產生文字</button>
+          <button class="ghost" onclick="copyReport()">複製文字</button>
+          <button class="orange" onclick="deleteCurrentSuspect()">刪除此犯嫌</button>
+        </div>
+      </div>
+    </section>
+      <section id="printAllContainer"></section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "legalObstacleMultiSuspectApp";
+
+    const reasons = [
+      "因交通障礙或其他不可抗力事由所生不得已之遲滯",
+      "在途解送時間",
+      "依第一百條之三第一項規定不得為訊問",
+      "因被告或犯罪嫌疑人身體健康突發之事由，事實上不能訊問",
+      "被告或犯罪嫌疑人表示已選任辯護人，或強制辯護案件，因等候其辯護人到場致未予訊問者",
+      "依第三十五條第三項通知陪同在場之人到場致未予訊問者",
+      "犯罪嫌疑人經法院提審之期間",
+      "依第三十四條第二項辯護人與偵查中受拘提或逮捕之被告或犯罪嫌疑人接見之時間"
+    ];
+
+    let app = loadData();
+    let currentId = null;
+
+    function defaultApp() {
+      return {
+        baseHours: 24,
+        suspects: [
+          createSuspect("甲"),
+          createSuspect("乙"),
+          createSuspect("丙")
+        ]
+      };
+    }
+
+    function makeId() {
+      return "s" + Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+    }
+
+    function createSuspect(name = "") {
+      return {
+        id: makeId(),
+        name,
+        arrestTime: "",
+        periods: reasons.map((reason, index) => ({
+          code: String(index + 1).padStart(2, "0"),
+          reason,
+          checked: false,
+          start: "",
+          end: "",
+          desc: ""
+        }))
+      };
+    }
+
+    function loadData() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return defaultApp();
+      try {
+        const parsed = JSON.parse(raw);
+        if (!parsed.suspects || !Array.isArray(parsed.suspects)) return defaultApp();
+        parsed.baseHours = 24;
+        parsed.suspects.forEach(s => {
+          if (!s.periods || s.periods.length !== reasons.length) {
+            s.periods = reasons.map((reason, index) => {
+              const code = String(index + 1).padStart(2, "0");
+              const old = (s.periods || []).find(p => p.code === code || p.reason === reason) || {};
+              return { code, reason, checked: !!old.checked, start: old.start || "", end: old.end || "", desc: old.desc || "" };
+            });
+          }
+        });
+        return parsed;
+      } catch {
+        return defaultApp();
+      }
+    }
+
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(app));
+    }
+
+    function saveAndRender() {
+      app.baseHours = 24;
+      saveData();
+      renderList();
+      if (currentId) renderDetail(currentId);
+    }
+
+    function renderList() {
+      const tbody = document.getElementById("suspectTableBody");
+      const empty = document.getElementById("emptyList");
+      tbody.innerHTML = "";
+      empty.style.display = app.suspects.length ? "none" : "block";
+
+      app.suspects.forEach(s => {
+        const calc = calculateSuspect(s);
+        const tr = document.createElement("tr");
+        tr.dataset.id = s.id;
+        tr.ondragover = handleDragOver;
+        tr.ondragleave = handleDragLeave;
+        tr.ondrop = event => handleDrop(event, s.id);
+        tr.innerHTML = `
+          <td class="suspect-cell">
+            <span class="drag-handle" draggable="true" title="拖曳調整順序" ondragstart="handleDragStart(event, '${s.id}')">☰</span>
+            <input value="${escapeHtml(s.name)}" placeholder="姓名或代號" oninput="updateSuspectFromList('${s.id}', 'name', this.value)" />
+          </td>
+          <td class="arrest-time-cell"><input class="arrest-time-input" type="text" placeholder="例如：11505191400" value="${escapeHtml(toRocInput(s.arrestTime))}" onchange="updateSuspectFromList('${s.id}', 'arrestTime', this.value)" /></td>
+          <td><span class="badge">${formatMinutes(calc.obstacleMinutes)}</span></td>
+          <td>${deadlineBadge(calc.deadline16, calc.remaining16Minutes, calc.hasArrestTime)}</td>
+          <td>${deadlineBadge(calc.deadline24, calc.remaining24Minutes, calc.hasArrestTime)}</td>
+          <td class="center action-col"><button onclick="goDetail('${s.id}')">明細</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function remainBadge(minutes, hasArrestTime) {
+      if (!hasArrestTime) return `<span class="badge gray">未設定拘捕時間</span>`;
+      if (minutes < 0) return `<span class="badge red">逾時 ${formatMinutes(Math.abs(minutes))}</span>`;
+      return `<span class="badge green">剩餘 ${formatMinutes(minutes)}</span>`;
+    }
+
+    function deadlineBadge(deadline, remainingMinutes, hasArrestTime) {
+      if (!hasArrestTime || !deadline) return `<span class="badge gray">未設定</span>`;
+      const status = remainingMinutes < 0
+        ? `<span class="badge red">已逾 ${formatMinutes(Math.abs(remainingMinutes))}</span>`
+        : `<span class="badge green">剩 ${formatMinutes(remainingMinutes)}</span>`;
+      return `${status}<div class="muted">${escapeHtml(formatDateTime(deadline))}前</div>`;
+    }
+
+    function renderDetail(id) {
+      const suspect = app.suspects.find(s => s.id === id);
+      if (!suspect) return goList();
+      currentId = id;
+
+      document.getElementById("detailTitle").textContent = `明細｜${suspect.name || "未命名犯嫌"} 法定障礙時間細節`;
+      document.getElementById("detailName").value = suspect.name || "";
+      document.getElementById("detailArrestTime").value = toRocInput(suspect.arrestTime);
+
+      const calc = calculateSuspect(suspect);
+      document.getElementById("detailObstacleTotal").textContent = formatMinutes(calc.obstacleMinutes);
+      document.getElementById("detailRemainTime").textContent = calc.hasArrestTime
+        ? formatDateTime(calc.deadline24)
+        : "未設定";
+
+      const warning = document.getElementById("detailWarning");
+      const messages = [];
+      if (calc.errors.length) messages.push(...calc.errors);
+      if (calc.overlapMinutes > 0) messages.push(`偵測到重疊區間，已自動合併，避免重複列計 ${formatMinutes(calc.overlapMinutes)}。`);
+      if (messages.length) {
+        warning.classList.add("show");
+        warning.innerHTML = messages.map(m => `⚠ ${escapeHtml(m)}`).join("<br>");
+      } else {
+        warning.classList.remove("show");
+        warning.innerHTML = "";
+      }
+
+      const list = document.getElementById("reasonList");
+      list.innerHTML = "";
+      suspect.periods.forEach((p, index) => {
+        const oneCalc = calculateSinglePeriod(p);
+        const card = document.createElement("div");
+        card.className = `reason-card ${p.checked ? "active" : ""}`;
+        card.innerHTML = `
+          <label class="reason-title">
+            <input type="checkbox" ${p.checked ? "checked" : ""} onchange="updatePeriod('${p.code}', 'checked', this.checked)" />
+            <span>${index + 1}. ${escapeHtml(p.reason)}</span>
+          </label>
+          <div class="reason-body">
+            <div class="grid-3">
+              <div>
+                <label>起始時間</label>
+                <input type="text" placeholder="例如：11505191400" value="${escapeHtml(toRocInput(p.start))}" onchange="updatePeriod('${p.code}', 'start', this.value)" />
+              </div>
+              <div>
+                <label>結束時間</label>
+                <input type="text" placeholder="例如：11505191510" value="${escapeHtml(toRocInput(p.end))}" onchange="updatePeriod('${p.code}', 'end', this.value)" />
+              </div>
+              <div>
+                <label>本項時間</label>
+                <div class="duration-line">${oneCalc.label}</div>
+              </div>
+            </div>
+            <div style="margin-top:12px;">
+              <label>事由說明</label>
+              <textarea placeholder="可補充具體情形、通知時間、等候原因、佐證資料位置等。" oninput="updatePeriod('${p.code}', 'desc', this.value)">${escapeHtml(p.desc || "")}</textarea>
+            </div>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    function calculateSinglePeriod(p) {
+      if (!p.checked) return { minutes: 0, label: "未勾選" };
+      const start = toDate(p.start);
+      const end = toDate(p.end);
+      if (!start || !end) return { minutes: 0, label: "請填完整起迄時間", error: true };
+      if (end <= start) return { minutes: 0, label: "時間錯誤", error: true };
+      const minutes = Math.round((end - start) / 60000);
+      return { minutes, label: formatMinutes(minutes) };
+    }
+
+    function calculateSuspect(s) {
+      const errors = [];
+      const validPeriods = [];
+      let rawMinutes = 0;
+
+      s.periods.forEach((p, idx) => {
+        if (!p.checked) return;
+        const start = toDate(p.start);
+        const end = toDate(p.end);
+        if (!start || !end) {
+          errors.push(`第 ${idx + 1} 項「${p.reason}」尚未填完整起迄時間。`);
+          return;
+        }
+        if (end <= start) {
+          errors.push(`第 ${idx + 1} 項「${p.reason}」結束時間不得早於或等於起始時間。`);
+          return;
+        }
+        const minutes = Math.round((end - start) / 60000);
+        rawMinutes += minutes;
+        validPeriods.push({ start, end, minutes });
+      });
+
+      const merged = mergePeriods(validPeriods);
+      const obstacleMinutes = merged.reduce((sum, p) => sum + Math.round((p.end - p.start) / 60000), 0);
+      const overlapMinutes = Math.max(0, rawMinutes - obstacleMinutes);
+      const arrest = toDate(s.arrestTime);
+      const hasArrestTime = !!arrest;
+      let remainingMinutes = null;
+      let deadline16 = null;
+      let deadline24 = null;
+      let remaining16Minutes = null;
+      let remaining24Minutes = null;
+
+      if (arrest) {
+        const now = new Date();
+        const elapsedMinutes = Math.max(0, Math.round((now - arrest) / 60000));
+        remainingMinutes = (Number(app.baseHours || 24) * 60) - (elapsedMinutes - obstacleMinutes);
+        deadline16 = addMinutes(arrest, 16 * 60 + obstacleMinutes);
+        deadline24 = addMinutes(arrest, 24 * 60 + obstacleMinutes);
+        remaining16Minutes = Math.round((deadline16 - now) / 60000);
+        remaining24Minutes = Math.round((deadline24 - now) / 60000);
+      }
+
+      return { errors, rawMinutes, obstacleMinutes, overlapMinutes, remainingMinutes, hasArrestTime, deadline16, deadline24, remaining16Minutes, remaining24Minutes };
+    }
+
+    function mergePeriods(periods) {
+      if (!periods.length) return [];
+      const sorted = [...periods].sort((a, b) => a.start - b.start);
+      const merged = [{ start: sorted[0].start, end: sorted[0].end }];
+      for (let i = 1; i < sorted.length; i++) {
+        const last = merged[merged.length - 1];
+        const cur = sorted[i];
+        if (cur.start <= last.end) {
+          if (cur.end > last.end) last.end = cur.end;
+        } else {
+          merged.push({ start: cur.start, end: cur.end });
+        }
+      }
+      return merged;
+    }
+
+    function addMinutes(date, minutes) {
+      return new Date(date.getTime() + minutes * 60000);
+    }
+
+    function printDeadlineText(deadline, remainingMinutes, hasArrestTime) {
+      if (!hasArrestTime || !deadline) return "未設定";
+      const remainText = remainingMinutes < 0
+        ? `已逾 ${formatMinutes(Math.abs(remainingMinutes))}`
+        : `剩餘 ${formatMinutes(remainingMinutes)}`;
+      return `${formatDateTime(deadline)}前送達（${remainText}）`;
+    }
+
+    let draggedSuspectId = null;
+
+    function handleDragStart(event, id) {
+      draggedSuspectId = id;
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", id);
+    }
+
+    function handleDragOver(event) {
+      event.preventDefault();
+      event.currentTarget.classList.add("drag-over");
+      event.dataTransfer.dropEffect = "move";
+    }
+
+    function handleDragLeave(event) {
+      event.currentTarget.classList.remove("drag-over");
+    }
+
+    function handleDrop(event, targetId) {
+      event.preventDefault();
+      event.currentTarget.classList.remove("drag-over");
+
+      const sourceId = draggedSuspectId || event.dataTransfer.getData("text/plain");
+      draggedSuspectId = null;
+      if (!sourceId || sourceId === targetId) return;
+
+      const sourceIndex = app.suspects.findIndex(s => s.id === sourceId);
+      const targetIndex = app.suspects.findIndex(s => s.id === targetId);
+      if (sourceIndex < 0 || targetIndex < 0) return;
+
+      const [moved] = app.suspects.splice(sourceIndex, 1);
+      app.suspects.splice(targetIndex, 0, moved);
+      saveAndRender();
+    }
+
+    function updateSuspectFromList(id, field, value) {
+      const s = app.suspects.find(x => x.id === id);
+      if (!s) return;
+      s[field] = value;
+      saveData();
+      renderList();
+    }
+
+    function updateCurrentSuspectField(field, value) {
+      const s = app.suspects.find(x => x.id === currentId);
+      if (!s) return;
+      s[field] = value;
+      saveAndRender();
+    }
+
+    function updatePeriod(code, field, value) {
+      const s = app.suspects.find(x => x.id === currentId);
+      if (!s) return;
+      const p = s.periods.find(x => x.code === code);
+      if (!p) return;
+      p[field] = value;
+      saveAndRender();
+    }
+
+    function addSuspect() {
+      const newSuspect = createSuspect(`犯嫌${app.suspects.length + 1}`);
+      app.suspects.push(newSuspect);
+      saveData();
+      renderList();
+      goDetail(newSuspect.id);
+    }
+
+    function deleteCurrentSuspect() {
+      const s = app.suspects.find(x => x.id === currentId);
+      if (!s) return;
+      if (!confirm(`確定刪除「${s.name || "未命名犯嫌"}」嗎？`)) return;
+      app.suspects = app.suspects.filter(x => x.id !== currentId);
+      saveData();
+      goList();
+    }
+
+    function resetDemo() {
+      if (!confirm("確定回復為甲、乙、丙範例？現有資料會被覆蓋。")) return;
+      app = defaultApp();
+      saveData();
+      goList();
+    }
+
+    function clearAllData() {
+      if (!confirm("確定清除全部資料？")) return;
+      app = { baseHours: 24, suspects: [] };
+      localStorage.removeItem(STORAGE_KEY);
+      saveAndRender();
+    }
+
+    function goDetail(id) {
+      currentId = id;
+      document.getElementById("pageList").classList.remove("active");
+      document.getElementById("pageDetail").classList.add("active");
+      document.getElementById("report").value = "";
+      renderDetail(id);
+    }
+
+    function goList() {
+      currentId = null;
+      document.getElementById("pageDetail").classList.remove("active");
+      document.getElementById("pageList").classList.add("active");
+      renderList();
+    }
+
+    function printPage() {
+      saveAndRender();
+      document.body.classList.remove("print-all");
+      setTimeout(() => window.print(), 100);
+    }
+
+    function printAllPages() {
+      saveAndRender();
+      buildPrintAllContainer();
+      document.body.classList.add("print-all");
+      setTimeout(() => window.print(), 100);
+    }
+
+    window.addEventListener("afterprint", () => {
+      document.body.classList.remove("print-all");
+    });
+
+    function buildPrintAllContainer() {
+      const container = document.getElementById("printAllContainer");
+      const nowText = formatDateTimeForPrint(new Date());
+      let html = `
+        <div class="print-page">
+          <div class="print-section-title">摘要｜犯嫌總覽</div>
+          <div class="print-subtitle">列印時間：${escapeHtml(nowText)}　總時限：24 小時</div>
+          <table>
+            <thead>
+              <tr>
+                <th>犯嫌</th>
+                <th>拘捕時間</th>
+                <th>司法警察歷經法定障礙時間</th>
+                <th>司法警察距16小時屆滿剩餘時間</th>
+                <th>24小時屆滿時間</th>
+                <th>抵達時間</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      app.suspects.forEach(s => {
+        const calc = calculateSuspect(s);
+        const remainText = !calc.hasArrestTime
+          ? "未設定拘捕時間"
+          : (calc.remainingMinutes < 0 ? `逾時 ${formatMinutes(Math.abs(calc.remainingMinutes))}` : `剩餘 ${formatMinutes(calc.remainingMinutes)}`);
+        html += `
+          <tr>
+            <td>${escapeHtml(s.name || "未命名犯嫌")}</td>
+            <td>${escapeHtml(s.arrestTime ? formatDateTime(s.arrestTime) : "未設定")}</td>
+            <td>${escapeHtml(formatMinutes(calc.obstacleMinutes))}</td>
+            <td>${escapeHtml(printDeadlineText(calc.deadline16, calc.remaining16Minutes, calc.hasArrestTime))}</td>
+            <td>${escapeHtml(printDeadlineText(calc.deadline24, calc.remaining24Minutes, calc.hasArrestTime))}</td>
+            <td>　　　　　　　　　</td>
+          </tr>
+        `;
+      });
+
+      html += `
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      app.suspects.forEach(s => {
+        const calc = calculateSuspect(s);
+        const remainText = !calc.hasArrestTime
+          ? "未設定"
+          : (calc.remainingMinutes < 0 ? `逾時 ${formatMinutes(Math.abs(calc.remainingMinutes))}` : `剩餘 ${formatMinutes(calc.remainingMinutes)}`);
+        const selected = s.periods.filter(p => p.checked);
+
+        html += `
+          <div class="print-page">
+            <div class="print-section-title">明細｜${escapeHtml(s.name || "未命名犯嫌")} 法定障礙時間細節</div>
+            <table>
+              <tbody>
+                <tr>
+                  <th style="width:25%;">犯嫌</th>
+                  <td style="width:25%;">${escapeHtml(s.name || "未命名犯嫌")}</td>
+                  <th style="width:25%;">拘捕時間</th>
+                  <td style="width:25%;">${escapeHtml(s.arrestTime ? formatDateTime(s.arrestTime) : "未設定")}</td>
+                </tr>
+                <tr>
+                  <th>司法警察歷經法定障礙時間</th>
+                  <td>${escapeHtml(formatMinutes(calc.obstacleMinutes))}</td>
+                  <th>24小時屆滿時間</th>
+                  <td>${escapeHtml(printDeadlineText(calc.deadline24, calc.remaining24Minutes, calc.hasArrestTime))}</td>
+                </tr>
+              </tbody>
+            </table>
+        `;
+
+        if (calc.errors.length) {
+          html += `<p><strong>注意：</strong>${escapeHtml(calc.errors.join("；"))}</p>`;
+        }
+        if (calc.overlapMinutes > 0) {
+          html += `<p><strong>重疊區間：</strong>已自動合併，避免重複列計 ${escapeHtml(formatMinutes(calc.overlapMinutes))}。</p>`;
+        }
+
+        if (!selected.length) {
+          html += `<p>未登錄法定障礙事由。</p>`;
+        } else {
+          selected.forEach((p, idx) => {
+            const single = calculateSinglePeriod(p);
+            html += `
+              <div class="print-detail-block">
+                <strong>${idx + 1}. ${escapeHtml(p.reason)}</strong><br>
+                起始時間：${escapeHtml(p.start ? formatDateTime(p.start) : "未填寫")}<br>
+                結束時間：${escapeHtml(p.end ? formatDateTime(p.end) : "未填寫")}<br>
+                本項時間：${escapeHtml(single.label)}<br>
+                事由說明：${escapeHtml(p.desc || "無")}
+              </div>
+            `;
+          });
+        }
+
+        html += `</div>`;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function generateReport() {
+      const s = app.suspects.find(x => x.id === currentId);
+      if (!s) return;
+      const calc = calculateSuspect(s);
+      if (calc.errors.length) {
+        alert("尚有時間欄位未完成或錯誤，請修正後再產生文字。");
+        return;
+      }
+
+      const selected = s.periods.filter(p => p.checked && toDate(p.start) && toDate(p.end) && toDate(p.end) > toDate(p.start));
+      if (!selected.length) {
+        alert("請至少勾選一項法定障礙事由並填寫起迄時間。");
+        return;
+      }
+
+      let text = `本案犯罪嫌疑人${s.name ? "「" + s.name + "」" : ""}於拘捕後`;
+      if (s.arrestTime) text += `（拘捕時間：${formatDateTime(s.arrestTime)}）`;
+      text += `，因有法定障礙事由，經登錄如下：\n\n`;
+
+      selected.forEach((p, idx) => {
+        const minutes = Math.round((toDate(p.end) - toDate(p.start)) / 60000);
+        text += `${toChineseNumber(idx + 1)}、${p.reason}，自 ${formatDateTime(p.start)}起至 ${formatDateTime(p.end)}止，經過時間為 ${formatMinutes(minutes)}。`;
+        if (p.desc && p.desc.trim()) text += `事由說明：${p.desc.trim()}。`;
+        text += `\n\n`;
+      });
+
+      text += `以上法定障礙事由經合併重疊區間後，司法警察歷經法定障礙時間合計為 ${formatMinutes(calc.obstacleMinutes)}。`;
+      if (calc.hasArrestTime) {
+        text += calc.remainingMinutes < 0
+          ? `目前24小時屆滿時間顯示為逾時 ${formatMinutes(Math.abs(calc.remainingMinutes))}。`
+          : `目前24小時屆滿時間為 ${formatMinutes(calc.remainingMinutes)}。`;
+      }
+      document.getElementById("report").value = text;
+    }
+
+    async function copyReport() {
+      const text = document.getElementById("report").value;
+      if (!text) return alert("請先產生文字。");
+      await navigator.clipboard.writeText(text);
+      alert("已複製文字。");
+    }
+
+    function toDate(value) {
+      if (!value) return null;
+      if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+
+      const text = String(value).trim();
+      if (!text) return null;
+
+      const digitsOnly = text.replace(/[^0-9]/g, "");
+
+      // 支援純數字民國制：11505191400 = 115年05月19日14時00分
+      if (digitsOnly.length === 11) {
+        const rocYear = Number(digitsOnly.slice(0, 3));
+        const month = Number(digitsOnly.slice(3, 5));
+        const day = Number(digitsOnly.slice(5, 7));
+        const hour = Number(digitsOnly.slice(7, 9));
+        const minute = Number(digitsOnly.slice(9, 11));
+        const d = new Date(rocYear + 1911, month - 1, day, hour, minute);
+        if (isValidDateParts(d, rocYear + 1911, month, day, hour, minute)) return d;
+      }
+
+      // 也支援 7 碼日期：1150519，預設 00:00
+      if (digitsOnly.length === 7) {
+        const rocYear = Number(digitsOnly.slice(0, 3));
+        const month = Number(digitsOnly.slice(3, 5));
+        const day = Number(digitsOnly.slice(5, 7));
+        const d = new Date(rocYear + 1911, month - 1, day, 0, 0);
+        if (isValidDateParts(d, rocYear + 1911, month, day, 0, 0)) return d;
+      }
+
+      const cleaned = text
+        .replaceAll("年", " ")
+        .replaceAll("月", " ")
+        .replaceAll("日", " ")
+        .replaceAll("時", " ")
+        .replaceAll("分", " ")
+        .replaceAll("/", " ")
+        .replaceAll("-", " ")
+        .replaceAll(".", " ")
+        .replaceAll("T", " ")
+        .replaceAll(":", " ")
+        .replaceAll("：", " ");
+
+      const nums = cleaned.split(" ").filter(Boolean).map(Number);
+      if (nums.length >= 5 && nums.every(n => Number.isFinite(n))) {
+        let year = nums[0];
+        if (year < 1911) year += 1911;
+        const d = new Date(year, nums[1] - 1, nums[2], nums[3], nums[4]);
+        if (isValidDateParts(d, year, nums[1], nums[2], nums[3], nums[4])) return d;
+      }
+
+      const d = new Date(text);
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+
+    function isValidDateParts(d, year, month, day, hour, minute) {
+      return !Number.isNaN(d.getTime())
+        && d.getFullYear() === year
+        && d.getMonth() + 1 === month
+        && d.getDate() === day
+        && d.getHours() === hour
+        && d.getMinutes() === minute;
+    }
+
+    function toRocInput(value) {
+      const d = toDate(value);
+      if (!d) return value || "";
+      const roc = d.getFullYear() - 1911;
+      return `${roc}年${pad(d.getMonth() + 1)}月${pad(d.getDate())}日${pad(d.getHours())}時${pad(d.getMinutes())}分`;
+    }
+
+    function formatMinutes(minutes) {
+      if (minutes === null || minutes === undefined) return "未設定";
+      const safe = Math.max(0, Math.round(minutes));
+      const h = Math.floor(safe / 60);
+      const m = safe % 60;
+      return `${h} 小時 ${m} 分`;
+    }
+
+    function pad(num) { return String(num).padStart(2, "0"); }
+
+    function formatDateTime(value) {
+      const d = toDate(value);
+      if (!d) return "未填寫";
+      const roc = d.getFullYear() - 1911;
+      return `${roc} 年 ${d.getMonth() + 1} 月 ${d.getDate()} 日 ${pad(d.getHours())} 時 ${pad(d.getMinutes())} 分`;
+    }
+
+    function formatDateTimeForPrint(date) {
+      const d = date instanceof Date ? date : toDate(date);
+      if (!d) return "未填寫";
+      const roc = d.getFullYear() - 1911;
+      return `${roc} 年 ${d.getMonth() + 1} 月 ${d.getDate()} 日 ${pad(d.getHours())} 時 ${pad(d.getMinutes())} 分`;
+    }
+
+    function toChineseNumber(num) {
+      const nums = ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"];
+      if (num <= 10) return nums[num];
+      if (num < 20) return `十${nums[num - 10]}`;
+      return String(num);
+    }
+
+    function escapeHtml(text) {
+      return String(text ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    setInterval(() => {
+      if (document.getElementById("pageList").classList.contains("active")) renderList();
+      if (currentId) renderDetail(currentId);
+    }, 60000);
+
+    renderList();
+  </script>
+</body>
+</html>
