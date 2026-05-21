@@ -212,13 +212,21 @@
       }
 
       .print-page {
-        break-after: page;
-        page-break-after: always;
+        break-inside: auto;
+        page-break-inside: auto;
       }
 
-      .print-page:last-child {
-        break-after: auto;
-        page-break-after: auto;
+      .print-detail-page {
+        break-before: auto;
+        page-break-before: auto;
+      }
+
+      .word-page-break {
+        break-before: page;
+        page-break-before: always;
+        height: 0;
+        line-height: 0;
+        font-size: 0;
       }
 
       .print-section-title {
@@ -238,6 +246,41 @@
         margin-bottom: 8px;
         break-inside: avoid;
         page-break-inside: avoid;
+      }
+
+      .print-summary-table th,
+      .print-summary-table td {
+        text-align: center;
+      }
+
+      .print-datetime {
+        line-height: 1.45;
+        white-space: normal;
+      }
+
+      .print-detail-summary-table,
+      .print-detail-item-table {
+        width: 100%;
+        table-layout: fixed;
+      }
+
+      .print-detail-item-table {
+        margin: 0 0 8px 0;
+        page-break-inside: auto;
+        break-inside: auto;
+      }
+
+      .print-detail-item-table th,
+      .print-detail-item-table td {
+        vertical-align: top;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+        white-space: normal;
+      }
+
+      .detail-item-label {
+        width: 22%;
+        text-align: center;
       }
 
       .card {
@@ -1036,23 +1079,44 @@
       const fileName = makeExportFileName("法定障礙事由時間控管表", "doc");
       const html = `
         <!doctype html>
-        <html>
+        <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
         <head>
           <meta charset="utf-8">
           <title>法定障礙事由時間控管表</title>
           <style>
-            body { font-family: "Microsoft JhengHei", Arial, sans-serif; font-size: 12pt; }
-            table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
-            th, td { border: 1px solid #000; padding: 6px; vertical-align: top; }
+            @page {
+              size: A4 portrait;
+              margin: 2cm 2cm 2cm 2cm;
+            }
+            @page Section1 {
+              size: 21cm 29.7cm;
+              margin-top: 2cm;
+              margin-right: 2cm;
+              margin-bottom: 2cm;
+              margin-left: 2cm;
+              mso-header-margin: 0cm;
+              mso-footer-margin: 0cm;
+            }
+            div.Section1 { page: Section1; }
+            body { font-family: "Microsoft JhengHei", Arial, sans-serif; font-size: 12pt; line-height: 1.55; margin: 0; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 14px; table-layout: fixed; }
+            th, td { border: 1px solid #000; padding: 6px; vertical-align: top; word-break: break-word; }
             th { background: #eee; }
-            .print-page { page-break-after: always; }
-            .print-page:last-child { page-break-after: auto; }
+            .print-page { page-break-inside: auto; }
+            .print-detail-page { page-break-before: auto; mso-page-break-before: auto; }
+            .word-page-break { page-break-before: always; mso-page-break-before: always; height: 0; line-height: 0; font-size: 0; }
             .print-section-title { font-size: 18pt; font-weight: bold; margin: 0 0 10px; }
             .print-subtitle { margin: 0 0 10px; }
-            .print-detail-block { border: 1px solid #000; padding: 8px; margin-bottom: 8px; }
+            .print-detail-block { border: 1px solid #000; padding: 8px; margin-bottom: 8px; page-break-inside: avoid; break-inside: avoid; }
+            .print-summary-table th, .print-summary-table td { text-align: center; }
+            .print-datetime { line-height: 1.45; white-space: normal; }
+            .print-detail-summary-table, .print-detail-item-table { width: 100%; table-layout: fixed; }
+            .print-detail-item-table { margin: 0 0 8px 0; page-break-inside: auto; break-inside: auto; }
+            .print-detail-item-table th, .print-detail-item-table td { vertical-align: top; word-break: break-word; overflow-wrap: anywhere; white-space: normal; }
+            .detail-item-label { width: 22%; text-align: center; }
           </style>
         </head>
-        <body>${container.innerHTML}</body>
+        <body><div class="Section1">${container.innerHTML}</div></body>
         </html>
       `;
       const blob = new Blob(["﻿", html], { type: "application/msword;charset=utf-8" });
@@ -1107,18 +1171,17 @@
       const container = document.getElementById("printAllContainer");
       const nowText = formatDateTimeForPrint(new Date());
       let html = `
-        <div class="print-page">
+        <div class="print-page print-summary-page">
           <div class="print-section-title">摘要｜犯嫌總覽</div>
           <div class="print-subtitle">列印時間：${escapeHtml(nowText)}　總時限：24 小時</div>
-          <table>
+          <table class="print-summary-table">
             <thead>
               <tr>
-                <th>犯嫌</th>
-                <th>拘捕時間</th>
-                <th>司法警察歷經法定障礙時間</th>
-                <th>司法警察距16小時屆滿剩餘時間</th>
-                <th>24小時屆滿時間</th>
-                <th>抵達時間</th>
+                <th style="width:13%;">犯嫌</th>
+                <th style="width:22%;">拘捕時間</th>
+                <th style="width:18%;">司法警察歷經法定障礙時間</th>
+                <th style="width:22%;">24小時屆滿時間</th>
+                <th style="width:25%;">抵達時間</th>
               </tr>
             </thead>
             <tbody>
@@ -1126,16 +1189,12 @@
 
       app.suspects.forEach(s => {
         const calc = calculateSuspect(s);
-        const remainText = !calc.hasArrestTime
-          ? "未設定拘捕時間"
-          : (calc.remainingMinutes < 0 ? `逾時 ${formatMinutes(Math.abs(calc.remainingMinutes))}` : `剩餘 ${formatMinutes(calc.remainingMinutes)}`);
         html += `
           <tr>
             <td>${escapeHtml(s.name || "未命名犯嫌")}</td>
-            <td>${escapeHtml(s.arrestTime ? formatDateTime(s.arrestTime) : "未設定")}</td>
+            <td>${formatDateTimeTwoLinesHtml(s.arrestTime)}</td>
             <td>${escapeHtml(formatMinutes(calc.obstacleMinutes))}</td>
-            <td>${escapeHtml(printDeadlineText(calc.deadline16, calc.remaining16Minutes, calc.hasArrestTime))}</td>
-            <td>${escapeHtml(printDeadlineText(calc.deadline24, calc.remaining24Minutes, calc.hasArrestTime))}</td>
+            <td>${formatDateTimeTwoLinesHtml(calc.deadline24)}</td>
             <td>　　　　　　　　　</td>
           </tr>
         `;
@@ -1155,9 +1214,10 @@
         const selected = s.periods.filter(p => p.checked);
 
         html += `
-          <div class="print-page">
+          <div class="word-page-break" style="page-break-before: always; mso-page-break-before: always; height: 0; line-height: 0; font-size: 0;">&nbsp;</div>
+          <div class="print-page print-detail-page">
             <div class="print-section-title">明細｜${escapeHtml(s.name || "未命名犯嫌")} 法定障礙時間細節</div>
-            <table>
+            <table class="print-detail-summary-table">
               <tbody>
                 <tr>
                   <th style="width:25%;">犯嫌</th>
@@ -1188,13 +1248,29 @@
           selected.forEach((p, idx) => {
             const single = calculateSinglePeriod(p);
             html += `
-              <div class="print-detail-block">
-                <strong>${idx + 1}. ${escapeHtml(p.reason)}</strong><br>
-                起始時間：${escapeHtml(p.start ? formatDateTime(p.start) : "未填寫")}<br>
-                結束時間：${escapeHtml(p.end ? formatDateTime(p.end) : "未填寫")}<br>
-                本項時間：${escapeHtml(single.label)}<br>
-                事由說明：${escapeHtml(p.desc || "無")}
-              </div>
+              <table class="print-detail-item-table">
+                <tbody>
+                  <tr>
+                    <th colspan="2">${idx + 1}. ${escapeHtml(p.reason)}</th>
+                  </tr>
+                  <tr>
+                    <th class="detail-item-label">起始時間</th>
+                    <td>${escapeHtml(p.start ? formatDateTime(p.start) : "未填寫")}</td>
+                  </tr>
+                  <tr>
+                    <th class="detail-item-label">結束時間</th>
+                    <td>${escapeHtml(p.end ? formatDateTime(p.end) : "未填寫")}</td>
+                  </tr>
+                  <tr>
+                    <th class="detail-item-label">本項時間</th>
+                    <td>${escapeHtml(single.label)}</td>
+                  </tr>
+                  <tr>
+                    <th class="detail-item-label">事由說明</th>
+                    <td>${escapeHtml(p.desc || "無")}</td>
+                  </tr>
+                </tbody>
+              </table>
             `;
           });
         }
@@ -1339,6 +1415,13 @@
       if (!d) return "未填寫";
       const roc = d.getFullYear() - 1911;
       return `${roc} 年 ${d.getMonth() + 1} 月 ${d.getDate()} 日 ${pad(d.getHours())} 時 ${pad(d.getMinutes())} 分`;
+    }
+
+    function formatDateTimeTwoLinesHtml(value) {
+      const d = toDate(value);
+      if (!d) return "未設定";
+      const roc = d.getFullYear() - 1911;
+      return `<div class="print-datetime"><div>${roc} 年 ${d.getMonth() + 1} 月 ${d.getDate()} 日</div><div>${pad(d.getHours())} 時 ${pad(d.getMinutes())} 分</div></div>`;
     }
 
     function toChineseNumber(num) {
